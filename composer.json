@@ -1,0 +1,31 @@
+{
+  "name": "denisbondar/yii2-userside-api",
+  "description": "API for ERP USERSIDE for Yii2",
+  "keywords": [
+    "yii2",
+    "userside"
+  ],
+  "type": "yii2-extension",
+  "license": "BSD-3-Clause",
+  "support": {
+    "issues": "https://github.com/denisbondar/yii2-userside-api/issues",
+    "wiki": "http://wiki.userside.eu/API",
+    "source": "https://github.com/denisbondar/yii2-userside-api"
+  },
+  "authors": [
+    {
+      "name": "Denis Bondar",
+      "email": "bondar.den@gmail.com",
+      "homepage": "https://blog.denisbondar.com"
+    }
+  ],
+  "require": {
+    "yiisoft/yii2": "~2.0.0",
+    "linslin/yii2-curl": "~1.2.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "denisbondar\\userside\\api\\": "src"
+    }
+  }
+}
