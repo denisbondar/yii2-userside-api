@@ -38,7 +38,6 @@ class UsApiInteraction
     public function prepare($params)
     {
         $params = ArrayHelper::merge($this->baseParams, $params);
-
         $this->curl->setGetParams($params);
 
         return $this;
@@ -52,6 +51,14 @@ class UsApiInteraction
     public function get()
     {
         $response = json_decode($this->curl->get(self::URL));
+        $this->checkResponse($response);
+
+        return $response;
+    }
+
+    public function post()
+    {
+        $response = json_decode($this->curl->post(self::URL));
         $this->checkResponse($response);
 
         return $response;
@@ -76,5 +83,17 @@ class UsApiInteraction
             throw new \ErrorException(
                 sprintf('API Response Error: %s', $response->ErrorText));
         }
+    }
+
+    /**
+     * Включает режим обратной сортировки выборки
+     *
+     * @return UsApiInteraction
+     */
+    public function sortDesc()
+    {
+        $this->curl->setGetParams(['sort_desc' => 1]);
+
+        return $this;
     }
 }

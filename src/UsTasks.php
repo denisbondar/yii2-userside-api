@@ -50,21 +50,23 @@ class UsTasks extends Model
     }
 
     /**
+     * Метод детальной информации о задании: show
+     *
      * @param $id int
      * @return UsTasks
      * @throws ErrorException
      */
     public static function show($id)
     {
-        if (!is_int($id)) {
-            throw new InvalidParamException('ID must be integer');
+        if (!is_numeric($id)) {
+            throw new InvalidParamException('ID must be numeric.');
         }
 
         $interaction = \Yii::createObject(UsApiInteraction::class);
         $interaction->prepare([
             'cat' => self::CATEGORY,
             'subcat' => 'show',
-            'id' => $id,
+            'id' => (int)$id,
         ]);
         $result = $interaction->get();
 
@@ -84,5 +86,92 @@ class UsTasks extends Model
             'apart' => $data->address->apartament,
             'opis' => $data->description,
         ]);
+    }
+
+    /**
+     * Метод получения списка идентификаторов заданий: get_list
+     * Метод является поисковым. Возвращает массив ID заданий,
+     * удовлетворяющих заданным критериям поиска.
+     *
+     * @param $conditions array
+     * @return array
+     */
+    public static function find($conditions)
+    {
+        if (!empty($conditions['state_id']) && is_array($conditions['state_id'])) {
+            $conditions['state_id'] = implode(',', $conditions['state_id']);
+        }
+        if (!empty($conditions['type_id']) && is_array($conditions['type_id'])) {
+            $conditions['type_id'] = implode(',', $conditions['type_id']);
+        }
+        if (!empty($conditions['staff_id']) && is_array($conditions['staff_id'])) {
+            $conditions['staff_id'] = implode(',', $conditions['staff_id']);
+        }
+        if (!empty($conditions['division_id']) && is_array($conditions['division_id'])) {
+            $conditions['division_id'] = implode(',', $conditions['division_id']);
+        }
+
+        $interaction = \Yii::createObject(UsApiInteraction::class);
+        $interaction->prepare(array_merge([
+            'cat' => self::CATEGORY,
+            'subcat' => 'get_list'
+        ], $conditions));
+        $result = $interaction->get();
+
+        return [
+            'ids' => explode(',', $result->list),
+            'count' => $result->count,
+        ];
+    }
+
+    /**
+     * Метод получения списика связанных заданий: get_related_task_id
+     * Метод возвращает массив ID заданий, которые связаны с
+     * указанным ID задания.
+     *
+     * @param $id
+     * @return array
+     */
+    public static function relatedTasks($id)
+    {
+        if (!is_numeric($id)) {
+            throw new InvalidParamException('ID must be numeric.');
+        }
+
+        $interaction = \Yii::createObject(UsApiInteraction::class);
+        $interaction->prepare([
+            'cat' => self::CATEGORY,
+            'subcat' => 'get_related_task_id',
+            'id' => (int)$id,
+        ]);
+        $result = $interaction->get();
+
+        return explode(',', $result->Data);
+    }
+
+    /**
+     * Добавление комментария к заданию по его ID.
+     * Комментарий добавляется анонимно, так как API не предусматривает аутентификации.
+     *
+     * @param $id
+     * @param $comment
+     * @return int
+     */
+    public static function addComment($id, $comment)
+    {
+        if (!is_numeric($id)) {
+            throw new InvalidParamException('ID must be numeric.');
+        }
+
+        $interaction = \Yii::createObject(UsApiInteraction::class);
+        $interaction->prepare([
+            'cat' => self::CATEGORY,
+            'subcat' => 'comment_add',
+            'id' => (int)$id,
+            'comment' => trim($comment),
+        ]);
+        $result = $interaction->post();
+
+        return $result->Id;
     }
 }
