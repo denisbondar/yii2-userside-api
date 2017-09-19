@@ -1,9 +1,10 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Denis Bondar
- * Date: 17.09.2017
- * Time: 20:40
+ * @link      https://github.com/denisbondar/yii2-userside-api
+ * @package   yii2-userside-api
+ * @author    Denis Bondar <bondar.den@gmail.com>
+ * @license   MIT License - view the LICENSE file that was distributed with this source code.
+ * @date      17.09.2017
  */
 
 namespace denisbondar\userside\api;
@@ -30,34 +31,25 @@ class UsApiInteraction
     }
 
     /**
-     * Prepare USERSIDE API Request
+     * Make GET request to USERSIDE API
      *
      * @param $params
-     * @return UsApiInteraction
+     * @return mixed Response
      */
-    public function prepare($params)
+    public function get($params)
     {
         $params = ArrayHelper::merge($this->baseParams, $params);
         $this->curl->setGetParams($params);
-
-        return $this;
-    }
-
-    /**
-     * Make GET request to USERSIDE API
-     *
-     * @return mixed Response
-     */
-    public function get()
-    {
         $response = json_decode($this->curl->get(self::URL));
         $this->checkResponse($response);
 
         return $response;
     }
 
-    public function post()
+    public function post($params)
     {
+        $params = ArrayHelper::merge($this->baseParams, $params);
+        $this->curl->setPostParams($params);
         $response = json_decode($this->curl->post(self::URL));
         $this->checkResponse($response);
 

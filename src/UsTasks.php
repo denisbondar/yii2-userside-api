@@ -1,9 +1,10 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Denis Bondar
- * Date: 17.09.2017
- * Time: 19:35
+ * @link      https://github.com/denisbondar/yii2-userside-api
+ * @package   yii2-userside-api
+ * @author    Denis Bondar <bondar.den@gmail.com>
+ * @license   MIT License - view the LICENSE file that was distributed with this source code.
+ * @date      17.09.2017
  */
 
 namespace denisbondar\userside\api;
@@ -63,12 +64,11 @@ class UsTasks extends Model
         }
 
         $interaction = \Yii::createObject(UsApiInteraction::class);
-        $interaction->prepare([
+        $result = $interaction->get([
             'cat' => self::CATEGORY,
             'subcat' => 'show',
             'id' => (int)$id,
         ]);
-        $result = $interaction->get();
 
         $data = $result->Data;
 
@@ -112,11 +112,10 @@ class UsTasks extends Model
         }
 
         $interaction = \Yii::createObject(UsApiInteraction::class);
-        $interaction->prepare(array_merge([
+        $result = $interaction->get(array_merge([
             'cat' => self::CATEGORY,
             'subcat' => 'get_list'
         ], $conditions));
-        $result = $interaction->get();
 
         return [
             'ids' => explode(',', $result->list),
@@ -139,12 +138,11 @@ class UsTasks extends Model
         }
 
         $interaction = \Yii::createObject(UsApiInteraction::class);
-        $interaction->prepare([
+        $result = $interaction->get([
             'cat' => self::CATEGORY,
             'subcat' => 'get_related_task_id',
             'id' => (int)$id,
         ]);
-        $result = $interaction->get();
 
         return explode(',', $result->Data);
     }
@@ -164,14 +162,38 @@ class UsTasks extends Model
         }
 
         $interaction = \Yii::createObject(UsApiInteraction::class);
-        $interaction->prepare([
+        $result = $interaction->post([
             'cat' => self::CATEGORY,
             'subcat' => 'comment_add',
             'id' => (int)$id,
             'comment' => trim($comment),
         ]);
-        $result = $interaction->post();
 
         return $result->Id;
+    }
+
+    /**
+     * Проверка кода подтверждения
+     *
+     * @internal Метод не работает
+     * @param $id
+     * @param $code
+     * @return mixed
+     */
+    public static function checkVerifyCode($id, $code)
+    {
+        if (!is_numeric($id)) {
+            throw new InvalidParamException('ID must be numeric.');
+        }
+
+        $interaction = \Yii::createObject(UsApiInteraction::class);
+        $result = $interaction->get([
+            'cat' => self::CATEGORY,
+            'subcat' => 'check_verify_code',
+            'id' => (int)$id,
+            'verify_code' => trim($code),
+        ]);
+
+        return $result;
     }
 }
